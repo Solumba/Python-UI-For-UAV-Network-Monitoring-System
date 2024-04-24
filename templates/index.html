@@ -13,44 +13,40 @@
 	<body>
 		<div id="network" style="width: 800px; height: 600px"></div>
 		<script>
-			// Function to fetch graph data and render it
-			function draw() {
-				fetch('/graph')
-					.then((response) => response.json())
-					.then((data) => {
-						const nodes = [];
-						const edges = [];
+            function draw() {
+                fetch('/graph')
+                .then(response => response.json())
+                .then(data => {
+                    const nodes = new vis.DataSet();
+                    const edges = new vis.DataSet();
+                    const addedNodeIds = new Set();  // To track added node IDs
 
-						data.forEach((item) => {
-							nodes.push({
-								id: item.node1.id,
-								label: item.node1.properties.uavName,
-								title: JSON.stringify(item.node1.properties),
-							});
-							nodes.push({
-								id: item.node2.id,
-								label: item.node2.properties.uavName,
-								title: JSON.stringify(item.node2.properties),
-							});
-							edges.push({
-								from: item.node1.id,
-								to: item.node2.id,
-								label: item.relationship.type,
-							});
-						});
+                    data.forEach(item => {
+                        // Add node1 if not already added
+                        if (!addedNodeIds.has(item.node1.id)) {
+                            nodes.add({id: item.node1.id, label: item.node1.properties.uavName});
+                            addedNodeIds.add(item.node1.id);  // Mark this node ID as added
+                        }
+                        // Add node2 if not already added
+                        if (!addedNodeIds.has(item.node2.id)) {
+                            nodes.add({id: item.node2.id, label: item.node2.properties.uavName});
+                            addedNodeIds.add(item.node2.id);  // Mark this node ID as added
+                        }
+                        
+                        // Add edge
+                        edges.add({from: item.node1.id, to: item.node2.id, label: item.relationship.type});
+                    });
 
-						// Create a network
-						var container = document.getElementById('network');
-						var graphData = {
-							nodes: new vis.DataSet(nodes),
-							edges: new vis.DataSet(edges),
-						};
-						var options = {}; // Optional: define options for customization
-						new vis.Network(container, graphData, options);
-					});
-			}
+                    const container = document.getElementById('network');
+                    const graphData = { nodes: nodes, edges: edges };
+                    const options = {};
+                    new vis.Network(container, graphData, options);
+                })
+                .catch(error => console.error('Error fetching the graph data:', error));
+            }
 
-			draw(); // Call draw function to render the graph
-		</script>
+            draw(); // Call draw function to render the graph
+        </script>
+
 	</body>
 </html>
