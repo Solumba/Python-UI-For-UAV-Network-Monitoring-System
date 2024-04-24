@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Graph Visualizer</title>
+		<link
+			href="https://unpkg.com/vis-network/styles/vis-network.min.css"
+			rel="stylesheet"
+			type="text/css"
+		/>
+		<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+	</head>
+	<body>
+		<div id="network" style="width: 800px; height: 600px"></div>
+		<script>
+			// Function to fetch graph data and render it
+			function draw() {
+				fetch('/graph')
+					.then((response) => response.json())
+					.then((data) => {
+						const nodes = [];
+						const edges = [];
+
+						data.forEach((item) => {
+							nodes.push({
+								id: item.node1.id,
+								label: item.node1.properties.uavName,
+								title: JSON.stringify(item.node1.properties),
+							});
+							nodes.push({
+								id: item.node2.id,
+								label: item.node2.properties.uavName,
+								title: JSON.stringify(item.node2.properties),
+							});
+							edges.push({
+								from: item.node1.id,
+								to: item.node2.id,
+								label: item.relationship.type,
+							});
+						});
+
+						// Create a network
+						var container = document.getElementById('network');
+						var graphData = {
+							nodes: new vis.DataSet(nodes),
+							edges: new vis.DataSet(edges),
+						};
+						var options = {}; // Optional: define options for customization
+						new vis.Network(container, graphData, options);
+					});
+			}
+
+			draw(); // Call draw function to render the graph
+		</script>
+	</body>
+</html>
