@@ -8,10 +8,12 @@
 			rel="stylesheet"
 			type="text/css"
 		/>
+        <link rel="stylesheet" href="style.css" type="text/css">
 		<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 	</head>
 	<body>
-		<div id="network" style="width: 800px; height: 600px"></div>
+        <div id="swarm-title" style="text-align: center; margin: 0px; width: 100%; background-color: rgb(15, 150, 240); color: white; height:15px; padding: 20px 0px; font-size: 20px;">Network Monitoring System</div>
+		<div id="network" style="width: 80%; height: 1000px; right: 0; left: 0; margin-right: auto; margin-left: auto; padding-top: 0;"></div>
 		<script>
             function draw() {
                 fetch('/graph')
@@ -46,6 +48,7 @@
             }
 
             draw(); // Call draw function to render the graph
+            setInterval(draw, 10000); // Update the graph every 10000 ms (10 seconds)
         </script>
 
 	</body>
