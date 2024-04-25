@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Graph Visualizer</title>
+		<link
+			href="https://unpkg.com/vis-network/styles/vis-network.min.css"
+			rel="stylesheet"
+			type="text/css"
+		/>
+        <link rel="stylesheet" href="style.css" type="text/css">
+		<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+	</head>
+	<body>
+        <div id="swarm-title" style="text-align: center; margin: 0px; width: 100%; background-color: rgb(15, 150, 240); color: white; height:15px; padding: 20px 0px; font-size: 20px;">Network Monitoring System</div>
+		<div id="network" style="width: 80%; height: 1000px; right: 0; left: 0; margin-right: auto; margin-left: auto; padding-top: 0;"></div>
+		<script>
+            function draw() {
+                fetch('/graph')
+                .then(response => response.json())
+                .then(data => {
+                    const nodes = new vis.DataSet();
+                    const edges = new vis.DataSet();
+                    const addedNodeIds = new Set();  // To track added node IDs
+
+                    data.forEach(item => {
+                        // Add node1 if not already added
+                        if (!addedNodeIds.has(item.node1.id)) {
+                            nodes.add({id: item.node1.id, label: item.node1.properties.uavName});
+                            addedNodeIds.add(item.node1.id);  // Mark this node ID as added
+                        }
+                        // Add node2 if not already added
+                        if (!addedNodeIds.has(item.node2.id)) {
+                            nodes.add({id: item.node2.id, label: item.node2.properties.uavName});
+                            addedNodeIds.add(item.node2.id);  // Mark this node ID as added
+                        }
+                        
+                        // Add edge
+                        edges.add({from: item.node1.id, to: item.node2.id, label: item.relationship.type});
+                    });
+
+                    const container = document.getElementById('network');
+                    const graphData = { nodes: nodes, edges: edges };
+                    const options = {};
+                    new vis.Network(container, graphData, options);
+                })
+                .catch(error => console.error('Error fetching the graph data:', error));
+            }
+
+            draw(); // Call draw function to render the graph
+            setInterval(draw, 10000); // Update the graph every 10000 ms (10 seconds)
+        </script>
+
+	</body>
+</html>
