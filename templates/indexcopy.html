@@ -10,7 +10,9 @@
 		<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.4.1.min.js"></script>
 		<script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-3.4.1.min.js"></script>
 
-		{{ script|safe }}
+		{{ latency_script|safe }}
+		<!-- Bokeh JS -->
+		{{ throughput_script|safe }}
 		<!-- Bokeh JS -->
 		<style>
 			#graph {
@@ -43,8 +45,10 @@
 		<div id="navbar">Network Monitoring System</div>
 		<div id="graph" style="width: 60%"></div>
 		<div id="dashboard-container" style="height: 50%">
-			{{ div|safe }} {{ div|safe }}
-			<!-- Bokeh plot -->
+			{{ latency_div|safe }}<!-- Bokeh plot -->
+		</div>
+		<div id="dashboard-container" style="height: 50%">
+			{{ throughput_div|safe }}<!-- Bokeh plot -->
 		</div>
 
 		<script>
