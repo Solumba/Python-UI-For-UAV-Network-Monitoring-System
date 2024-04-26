@@ -1,15 +1,60 @@
 from flask import Flask, render_template, jsonify
 from neo4j import GraphDatabase
+from pymongo import MongoClient
+import pandas as pd
+from bokeh.plotting import figure
+from bokeh.embed import components
+from bokeh.models import ColumnDataSource
 
 app = Flask(__name__)
 
 # Neo4j connection setup
-
 driver = GraphDatabase.driver("neo4j://localhost:7687", auth=("neo4j", "Shady5000$"))
+
+
+app = Flask(__name__)
+client = MongoClient("mongodb://localhost:27017/")  # adjust the connection string as needed
+db = client['ddos_simulation']  # your database name
+collection = db['metrics']  # your collection name
+
+def fetch_data():
+    # Fetch data for node 0 and node 5
+    filter_query = {'node': {'$in': [0, 5]}}
+    data = pd.DataFrame(list(collection.find(filter_query, {'_id': 0, 'node': 1, 'time': 1, 'latency': 1})))
+    print(data.head())  # Print the first few rows to inspect the DataFrame structure
+    return data
+
+# def create_plot(data):
+#     plot = figure(title="Test Plot")
+#     plot.circle([1, 2, 3], [4, 5, 6], size=20)
+#     script, div = components(plot)
+#     return script, div
+
+def create_plot(data):
+    # Filter data for node 0 and node 5
+    data_node0 = data[data['node'] == 0]
+    data_node5 = data[data['node'] == 5]
+    
+    # Create Bokeh plot
+    plot = figure(title="Latency over Time by Node", x_axis_label='Time (s)', y_axis_label='Latency (ms)', sizing_mode="scale_width")
+    source0 = ColumnDataSource(data_node0)
+    source5 = ColumnDataSource(data_node5)
+    
+    plot.line('time', 'latency', source=source0, line_width=2, color='blue', legend_label='Node 0')
+    plot.line('time', 'latency', source=source5, line_width=2, color='red', legend_label='Node 5')
+    
+    plot.legend.title = 'Node'
+    plot.legend.location = 'top_left'
+    
+    script, div = components(plot)
+    return script, div
+
 
 @app.route("/")
 def index():
-    return render_template('indexcopy.html')
+    data = fetch_data()
+    script, div = create_plot(data)
+    return render_template('indexcopy.html',  script=script, div=div)
 
 @app.route("/graph")
 def get_graph():
