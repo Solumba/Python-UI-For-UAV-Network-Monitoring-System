@@ -75,6 +75,25 @@
 				border-radius: 5%;
 			}
 
+			.metrics {
+				position: absolute;
+				right: 50px;
+				top: 100px;
+				height: 300px;
+				width: 300px;
+				background-color: #333;
+				color: white;
+				text-align: center;
+			}
+
+            .attack {
+                background-color: red;
+				color: white;
+				padding: 6px;
+				border: none;
+			}
+        
+
 			/* Responsive adjustments if needed */
 			@media (max-width: 600px) {
 				.dashboard-wrapper {
@@ -85,7 +104,7 @@
 	</head>
 	<body>
 		<div id="navbar">UAV Network Monitoring System</div>
-        
+
 		<div id="graph"></div>
 		<div class="search">
 			<label for="">Node:</label>
@@ -94,6 +113,11 @@
 			<input type="text" name="second_node" id="second_node" />
 			<button class="get-data">Get Node data</button>
 		</div>
+		<div class="metrics">
+            Network Metrics Goes Here
+            <button class="normal get-data">Normal Network</button>
+            <button class="attack">DDoS Attack</button>
+        </div>
 		<div class="dashboard-wrapper">
 			<div class="dashboard-container" style="height: 50%">
 				{{ latency_div|safe }}<!-- Bokeh plot -->

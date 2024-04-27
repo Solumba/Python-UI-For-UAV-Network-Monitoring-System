@@ -13,9 +13,9 @@ driver = GraphDatabase.driver("neo4j://localhost:7687", auth=("neo4j", "Shady500
 
 
 app = Flask(__name__)
-client = MongoClient("mongodb://localhost:27017/")  # adjust the connection string as needed
-db = client['ddos_simulation']  # your database name
-collection = db['metrics']  # your collection name
+client = MongoClient("mongodb://localhost:27017/")
+db = client['ddos_simulation']
+collection = db['metrics']
 
 def fetch_data():
     # Fetch data for node 0 and node 5
