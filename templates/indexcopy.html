@@ -56,6 +56,25 @@
 				box-sizing: border-box; /* Includes padding in the width and height */
 			}
 
+			.get-data {
+				background-color: green;
+				color: white;
+				padding: 6px;
+				border: none;
+			}
+
+			.search {
+				text-align: center;
+			}
+
+			input {
+				border: none;
+				background-color: #ffffff;
+				padding: 3px;
+				border: 2px solid grey;
+				border-radius: 5%;
+			}
+
 			/* Responsive adjustments if needed */
 			@media (max-width: 600px) {
 				.dashboard-wrapper {
@@ -66,8 +85,15 @@
 	</head>
 	<body>
 		<div id="navbar">UAV Network Monitoring System</div>
+        
 		<div id="graph"></div>
-        .search 
+		<div class="search">
+			<label for="">Node:</label>
+			<input type="text" name="first_node" id="first_node" />
+			<label for="">Node:</label>
+			<input type="text" name="second_node" id="second_node" />
+			<button class="get-data">Get Node data</button>
+		</div>
 		<div class="dashboard-wrapper">
 			<div class="dashboard-container" style="height: 50%">
 				{{ latency_div|safe }}<!-- Bokeh plot -->
