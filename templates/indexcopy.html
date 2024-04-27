@@ -14,41 +14,70 @@
 		<!-- Bokeh JS -->
 		{{ throughput_script|safe }}
 		<!-- Bokeh JS -->
+		{{ battery_script|safe }}
+		<!-- Bokeh JS -->
 		<style>
-			#graph {
-				text-align: left;
-				/* border: 10px solid black; */
-			}
-			#navbar {
-				background-color: blue;
-				color: white;
-				height: 20px;
-				width: 100%;
-				text-align: center;
-				padding: 10px 0px;
-				font-family: Arial, Helvetica, sans-serif;
-			}
-			#dashboard-container {
-				width: 40%;
-				height: 50%;
-				background-color: #ffffff;
-				overflow: auto;
-				padding: 20px;
-			}
 			.bk-Figure {
-				width: 400px;
-				height: 400px;
+				height: 300px;
+			}
+
+			body {
+				margin: 0;
+				font-family: Arial, sans-serif; /* Example of setting a default font for the body */
+			}
+
+			#navbar {
+				width: 100%;
+				background-color: #333;
+				color: white;
+				padding: 10px;
+				text-align: center;
+			}
+
+			#graph {
+				width: 100%;
+				height: 550px; /* Adjust based on your content */
+				background-color: #f0f0f0;
+				text-align: center;
+				margin-bottom: 10px;
+			}
+
+			.dashboard-wrapper {
+				display: flex; /* Enables flexbox */
+				justify-content: space-around; /* Distributes space around items */
+			}
+
+			.dashboard-container {
+				flex: 1; /* Each container will grow equally to fill the space */
+				margin: 5px; /* Gives space between the containers */
+				padding: 10px;
+				background-color: #e8e8e8;
+				height: 100px; /* Adjust based on your content */
+				box-sizing: border-box; /* Includes padding in the width and height */
+			}
+
+			/* Responsive adjustments if needed */
+			@media (max-width: 600px) {
+				.dashboard-wrapper {
+					flex-direction: column; /* Stacks the containers vertically */
+				}
 			}
 		</style>
 	</head>
 	<body>
-		<div id="navbar">Network Monitoring System</div>
-		<div id="graph" style="width: 60%"></div>
-		<div id="dashboard-container" style="height: 50%">
-			{{ latency_div|safe }}<!-- Bokeh plot -->
-		</div>
-		<div id="dashboard-container" style="height: 50%">
-			{{ throughput_div|safe }}<!-- Bokeh plot -->
+		<div id="navbar">UAV Network Monitoring System</div>
+		<div id="graph"></div>
+        .search 
+		<div class="dashboard-wrapper">
+			<div class="dashboard-container" style="height: 50%">
+				{{ latency_div|safe }}<!-- Bokeh plot -->
+			</div>
+			<div class="dashboard-container" style="height: 50%">
+				{{ throughput_div|safe }}<!-- Bokeh plot -->
+			</div>
+			<div class="dashboard-container" style="height: 50%">
+				{{ battery_div|safe }}<!-- Bokeh plot -->
+			</div>
 		</div>
 
 		<script>
@@ -67,7 +96,7 @@
 				const color = d3
 					.scaleOrdinal()
 					.domain(['UAV', 'BackboneUAV', 'GroundStation', 'None']) // Add all expected labels
-					.range(['blue', 'green', 'teal', 'grey']); // Corresponding colors
+					.range(['#333', 'green', 'teal', 'grey']); // Corresponding colors
 
 				const links = svg
 					.selectAll('.link')
