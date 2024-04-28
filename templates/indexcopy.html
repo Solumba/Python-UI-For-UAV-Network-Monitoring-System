@@ -114,14 +114,14 @@
 			<input type="text" name="second_node" id="second_node" />
 			<button type="submit" class="get-data">Get Node data</button>
 		</form>
-		<div class="metrics">
+		<form action="/simulation" class="metrics" method="post">
 			Network Metrics Goes Here
 			<div class="metric-texts">Centrality: network metric</div>
 			<div class="metric-texts">Betweeness: network metric</div>
 			<div class="metric-texts">Sparsity: network metric</div>
 			<button class="normal get-data">Normal Network</button>
-			<button class="attack">DDoS Attack</button>
-		</div>
+			<button type="submit" class="attack">DDoS Attack</button>
+		</form>
 		<div class="dashboard-wrapper">
 			<div class="dashboard-container" style="height: 50%">
 				{{ latency_div|safe }}<!-- Bokeh plot -->
