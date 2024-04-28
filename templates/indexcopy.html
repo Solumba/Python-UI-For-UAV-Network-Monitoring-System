@@ -82,10 +82,9 @@
 				right: 50px;
 				top: 100px;
 				height: 300px;
-				width: 300px;
+				width: 250px;
+				padding: 10px 30px;
 				background-color: white;
-				color: white;
-				text-align: center;
 				border: 2px dotted black;
 			}
 
@@ -117,6 +116,9 @@
 		</form>
 		<div class="metrics">
 			Network Metrics Goes Here
+			<div class="metric-texts">Centrality: network metric</div>
+			<div class="metric-texts">Betweeness: network metric</div>
+			<div class="metric-texts">Sparsity: network metric</div>
 			<button class="normal get-data">Normal Network</button>
 			<button class="attack">DDoS Attack</button>
 		</div>
@@ -177,7 +179,7 @@
 					.attr('x', (d) => d.x)
 					.attr('y', (d) => d.y + 20) // Offset below the node
 					.attr('text-anchor', 'middle') // Center the text under the node
-					.text((d) => d.label) // Use the 'name' property from node data
+					.text((d) => d.uavType) // Use the 'name' property from node data
 					.style('font-size', '12px')
 					.style('fill', 'black'); // Adjust color as needed
 

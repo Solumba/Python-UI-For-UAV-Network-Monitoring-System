@@ -190,7 +190,8 @@ def get_graph():
                 nodes[n_id] = {
                     'id': n_id,
                     'name': n.get('name', ''),  # Default to empty string if 'name' not present
-                    'label': list(n.labels)[0] if n.labels else 'None'  # Assume single label for simplicity
+                    'label': list(n.labels)[0] if n.labels else 'None', # Assume single label for simplicity
+                    'uavType': n.get('uavType', 'Unknown')  # Assuming 'm' can also have 'uavType'
                 }
             if record['m']:
                 m = record['m']
@@ -200,7 +201,8 @@ def get_graph():
                     nodes[m_id] = {
                         'id': m_id,
                         'name': m.get('name', ''),
-                        'label': list(m.labels)[0] if m.labels else 'None'
+                        'label': list(m.labels)[0] if m.labels else 'None',
+                        'uavType': m.get('uavType', 'Unknown')  # Assuming 'm' can also have 'uavType'
                     }
                 # Handle case when relationship 'r' may be None
                 links.append({
