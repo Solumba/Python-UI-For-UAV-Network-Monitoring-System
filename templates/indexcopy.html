@@ -18,12 +18,13 @@
 		<!-- Bokeh JS -->
 		<style>
 			.bk-Figure {
-				height: 300px;
+				height: 250px;
+				font-family: Arial, Helvetica, sans-serif;
 			}
 
 			body {
 				margin: 0;
-				font-family: Arial, sans-serif; /* Example of setting a default font for the body */
+				font-family: Arial, Helvetica, sans-serif; /* Example of setting a default font for the body */
 			}
 
 			#navbar {
@@ -40,6 +41,7 @@
 				background-color: #f0f0f0;
 				text-align: center;
 				margin-bottom: 10px;
+				padding-bottom: 100px;
 			}
 
 			.dashboard-wrapper {
@@ -81,9 +83,10 @@
 				top: 100px;
 				height: 300px;
 				width: 300px;
-				background-color: #333;
+				background-color: white;
 				color: white;
 				text-align: center;
+				border: 2px dotted black;
 			}
 
 			.attack {
@@ -105,13 +108,13 @@
 		<div id="navbar">UAV Network Monitoring System</div>
 
 		<div id="graph"></div>
-		<div class="search">
-			<label for="">Node:</label>
+		<form action="/submit" method="post" class="search">
+			<label for="first_node">UAV:</label>
 			<input type="text" name="first_node" id="first_node" />
-			<label for="">Node:</label>
+			<label for="second_node">UAV:</label>
 			<input type="text" name="second_node" id="second_node" />
-			<button class="get-data">Get Node data</button>
-		</div>
+			<button type="submit" class="get-data">Get Node data</button>
+		</form>
 		<div class="metrics">
 			Network Metrics Goes Here
 			<button class="normal get-data">Normal Network</button>

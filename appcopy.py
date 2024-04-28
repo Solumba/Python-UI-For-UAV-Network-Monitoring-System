@@ -1,4 +1,5 @@
-from flask import Flask, render_template, jsonify
+import sys
+from flask import Flask, render_template, jsonify, request
 from neo4j import GraphDatabase
 from pymongo import MongoClient
 import pandas as pd
@@ -17,6 +18,23 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client['ddos_simulation']
 collection = db['metrics']
 
+# Appending the path of projectB to sys.path
+path_to_add = '../UAV Monitoring System/'
+
+if path_to_add not in sys.path:
+    sys.path.append(path_to_add)
+
+#import UAVNetworkSimulation class from utilities.py file
+from utilities import UAVNetworkSimulation
+
+#Using imported functions
+URI = "neo4j://localhost:7687"
+AUTH = ("neo4j", "Shady5000$")
+
+network_sim = UAVNetworkSimulation(URI,AUTH)
+
+# Using instance methods
+
 def fetch_data():
     # Fetch data for node 0 and node 5
     filter_query = {'node': {'$in': [0, 5]}}
@@ -24,40 +42,81 @@ def fetch_data():
     print(data.head())  # Print the first few rows to inspect the DataFrame structure
     return data
 
+def fetch_data_for_nodes(node_one, node_two):
+    filter_query = {'node': {'$in': [node_one, node_two]}}
+    data = pd.DataFrame(list(collection.find(filter_query, {'_id': 0, 'node': 1, 'time': 1, 'latency': 1, 'throughput': 1, 'battery': 1})))
+    return data
+
 def plot_latency (data):
-    # Filter data for node 0 and node 5
+    # Filter default data for UAV 0 and UAV 5
     data_node0 = data[data['node'] == 0]
     data_node5 = data[data['node'] == 5]
     
     # Create Bokeh plot
-    plot = figure(title="Latency over Time by Node", x_axis_label='Time (s)', y_axis_label='Latency (ms)', sizing_mode="scale_width")
+    plot = figure(title="Latency over Time by UAV", x_axis_label='Time (s)', y_axis_label='Latency (ms)', sizing_mode="scale_width")
     source0 = ColumnDataSource(data_node0)
     source5 = ColumnDataSource(data_node5)
     
-    plot.line('time', 'latency', source=source0, line_width=2, color='blue', legend_label='Node 0')
-    plot.line('time', 'latency', source=source5, line_width=2, color='red', legend_label='Node 5')
+    plot.line('time', 'latency', source=source0, line_width=2, color='blue', legend_label='UAV 0')
+    plot.line('time', 'latency', source=source5, line_width=2, color='red', legend_label='UAV 5')
     
-    plot.legend.title = 'Node'
+    plot.legend.title = 'UAVs'
     plot.legend.location = 'top_left'
     
     script, div = components(plot)
     return script, div
 
+def plot_latency_input (data, node_one, node_two):
+    # Filter data for UAV 0 and UAV 5
+    data_node_one = data[data['node'] == node_one]
+    data_node_two = data[data['node'] == node_two]
+    
+    # Create Bokeh plot
+    plot = figure(title="Throughput over Time by UAV", x_axis_label='Time (s)', y_axis_label='Throughput (mbps)', sizing_mode="scale_width")
+    source_one = ColumnDataSource(data_node_one)
+    source_two = ColumnDataSource(data_node_two)
+    
+    plot.line('time', 'latency', source=source_one, line_width=2, color='blue', legend_label=f'UAV {node_one}')
+    plot.line('time', 'latency', source=source_two, line_width=2, color='red', legend_label=f'UAV {node_two}')
+    
+    plot.legend.title = 'UAVs'
+    plot.legend.location = 'top_left'
+    
+    script, div = components(plot)
+    return script, div
 
 def plot_throughput (data):
-    # Filter data for node 0 and node 5
+    # Filter data for UAV 0 and UAV 5
     data_node0 = data[data['node'] == 0]
     data_node5 = data[data['node'] == 5]
     
     # Create Bokeh plot
-    plot = figure(title="Throughput over Time by Node", x_axis_label='Time (s)', y_axis_label='Throughput (mbps)', sizing_mode="scale_width")
+    plot = figure(title="Throughput over Time by UAV", x_axis_label='Time (s)', y_axis_label='Throughput (mbps)', sizing_mode="scale_width")
     source0 = ColumnDataSource(data_node0)
     source5 = ColumnDataSource(data_node5)
     
-    plot.line('time', 'throughput', source=source0, line_width=2, color='green', legend_label='Node 0')
-    plot.line('time', 'throughput', source=source5, line_width=2, color='yellow', legend_label='Node 5')
+    plot.line('time', 'throughput', source=source0, line_width=2, color='green', legend_label='UAV 0')
+    plot.line('time', 'throughput', source=source5, line_width=2, color='yellow', legend_label='UAV 5')
     
-    plot.legend.title = 'Node'
+    plot.legend.title = 'UAVs'
+    plot.legend.location = 'top_left'
+    
+    script, div = components(plot)
+    return script, div
+
+def plot_throughput_input (data, node_one, node_two):
+    data_node_one = data[data['node'] == node_one]
+    data_node_two = data[data['node'] == node_two]
+    
+    # Create Bokeh plot
+    plot = figure(title="Throughput over Time by UAV", x_axis_label='Time (s)', y_axis_label='Throughput (mbps)', sizing_mode="scale_width")
+    source_one = ColumnDataSource(data_node_one)
+    source_two = ColumnDataSource(data_node_two)
+    
+    plot.line('time', 'throughput', source=source_one, line_width=2, color='green', legend_label=f'UAV {node_one}')
+    plot.line('time', 'throughput', source=source_two, line_width=2, color='yellow', legend_label=f'UAV {node_two}')
+    
+    plot.legend.title = 'UAVs'
     plot.legend.location = 'top_left'
     
     script, div = components(plot)
@@ -69,18 +128,39 @@ def plot_battery (data):
     data_node5 = data[data['node'] == 5]
     
     # Create Bokeh plot
-    plot = figure(title="Battery over Time by Node", x_axis_label='Time (s)', y_axis_label='Battery (%)', sizing_mode="scale_width")
+    plot = figure(title="Battery over Time by UAV", x_axis_label='Time (s)', y_axis_label='Battery (%)', sizing_mode="scale_width")
     source0 = ColumnDataSource(data_node0)
     source5 = ColumnDataSource(data_node5)
     
-    plot.line('time', 'battery', source=source0, line_width=2, color='black', legend_label='Node 0')
-    plot.line('time', 'battery', source=source5, line_width=2, color='red', legend_label='Node 5')
+    plot.line('time', 'battery', source=source0, line_width=2, color='black', legend_label='UAV 0')
+    plot.line('time', 'battery', source=source5, line_width=2, color='red', legend_label='UAV 5')
     
-    plot.legend.title = 'Node'
+    plot.legend.title = 'UAVs'
     plot.legend.location = 'top_left'
     
     script, div = components(plot)
     return script, div
+
+def plot_battery_input(data, node_one, node_two):
+    data_node_one = data[data['node'] == node_one]
+    data_node_two = data[data['node'] == node_two]
+    
+    plot = figure(title=f"Battery over Time for UAV {node_one} & {node_two}",
+                  x_axis_label='Time (s)', y_axis_label='Battery (%)',
+                  sizing_mode="scale_width")
+    source_one = ColumnDataSource(data_node_one)
+    source_two = ColumnDataSource(data_node_two)
+    
+    plot.line('time', 'battery', source=source_one, line_width=2, color='black', legend_label=f'UAV {node_one}')
+    plot.line('time', 'battery', source=source_two, line_width=2, color='red', legend_label=f'UAV {node_two}')
+    
+    plot.legend.title = 'UAVs'
+    plot.legend.location = 'top_left'
+    
+    script, div = components(plot)
+    return script, div
+
+
 
 
 @app.route("/")
@@ -131,6 +211,24 @@ def get_graph():
 
         graph = {"nodes": list(nodes.values()), "links": links}
         return jsonify(graph)
+
+
+@app.route('/submit', methods=['POST'])
+def plot_battery_data():
+    try:
+        node_one = request.form['first_node']
+        node_two = request.form['second_node']
+    except ValueError:
+        return "Please enter valid node numbers", 400
+    
+    n1 = int(node_one)
+    n2 = int(node_two)
+
+    data = fetch_data_for_nodes(n1, n2)  # Fetch data for these nodes
+    latency_script, latency_div = plot_latency_input (data, n1, n2)
+    throughput_script, throughput_div = plot_throughput_input (data, n1, n2)
+    battery_script, battery_div = plot_battery_input(data, n1, n2)
+    return render_template('indexcopy.html', latency_script=latency_script, latency_div=latency_div, throughput_script=throughput_script, throughput_div=throughput_div,  battery_script=battery_script, battery_div=battery_div)
 
 
 
