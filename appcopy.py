@@ -18,7 +18,7 @@ driver = GraphDatabase.driver("neo4j://localhost:7687", auth=("neo4j", "Shady500
 app = Flask(__name__)
 client = MongoClient("mongodb://localhost:27017/")
 db = client["ddos_simulation"]
-collection = db["metrics"]
+collection = db["simulation_metrics"]
 network_collection = db["network_metrics"]
 
 # Appending the path of projectB to sys.path
@@ -51,6 +51,7 @@ uav_network = network_sim.create_initial_graph(
 )
 attack_node_id = network_sim.add_attack_node(uav_network, target_ids, num_uavs)
 run_ddos_attack = network_sim.run_ddos_simulation
+run_network_simulation = network_sim.run_simulation
 
 
 # Using instance methods
@@ -426,11 +427,30 @@ def plot_battery_data():
     )
 
 
-@app.route("/simulation", methods=["POST"])
-def handle_button_click():
+# @app.route("/simulations", methods=["POST"])
+# def run_ddos_simulation():
+#     # Handle the button click here
+#     print("Button was clicked!")
+#     run_ddos_attack(
+#         uav_network,
+#         total_time,
+#         update_interval,
+#         move_range,
+#         connection_range,
+#         backbone_range,
+#         num_packets,
+#         attack_node_id,
+#         target_ids,
+#     )
+#     # You can redirect or render a template after handling
+#     return redirect(url_for("index"))
+
+
+@app.route("/simulations", methods=["POST"])
+def run_normal_simulation():
     # Handle the button click here
     print("Button was clicked!")
-    run_ddos_attack(
+    run_network_simulation(
         uav_network,
         total_time,
         update_interval,
@@ -438,8 +458,6 @@ def handle_button_click():
         connection_range,
         backbone_range,
         num_packets,
-        attack_node_id,
-        target_ids,
     )
     # You can redirect or render a template after handling
     return redirect(url_for("index"))

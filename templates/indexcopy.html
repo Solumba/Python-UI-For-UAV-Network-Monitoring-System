@@ -63,6 +63,7 @@
 				color: white;
 				padding: 6px;
 				border: none;
+				cursor: pointer;
 			}
 
 			.search {
@@ -85,7 +86,7 @@
 				width: 250px;
 				padding: 10px 30px;
 				background-color: white;
-				border: 2px dotted black;
+				box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 			}
 
 			.attack {
@@ -93,6 +94,7 @@
 				color: white;
 				padding: 6px;
 				border: none;
+				cursor: pointer;
 			}
 
 			/* Responsive adjustments if needed */
@@ -114,13 +116,13 @@
 			<input type="text" name="second_node" id="second_node" />
 			<button type="submit" class="get-data">Get Node data</button>
 		</form>
-		<form action="/simulation" class="metrics" method="post">
+		<form action="/simulations" class="metrics" method="post">
 			Network Metrics Goes Here
 			<div class="metric-texts">Centrality: network metric</div>
 			<div class="metric-texts">Betweeness: network metric</div>
 			<div class="metric-texts">Sparsity: network metric</div>
-			<button class="normal get-data">Normal Network</button>
-			<button type="submit" class="attack">DDoS Attack</button>
+			<button type="submit" name="button#_action" value="normalnetwork" class="normal get-data">Normal Network</button>
+			<button type="submit" name="button#_action" value="ddossim" class="attack">DDoS Attack</button>
 		</form>
 		<div class="dashboard-wrapper">
 			<div class="dashboard-container" style="height: 50%">
@@ -137,7 +139,7 @@
 		<script>
 			function drawGraph(graph) {
 				document.getElementById('graph').innerHTML = ''; // Clear the previous graph
-				const width = 500,
+				const width = 600,
 					height = 600;
 				const svg = d3
 					.select('#graph')
@@ -149,8 +151,8 @@
 				// Define color mapping based on labels
 				const color = d3
 					.scaleOrdinal()
-					.domain(['UAV', 'BackboneUAV', 'GroundStation', 'None']) // Add all expected labels
-					.range(['#333', 'green', 'teal', 'grey']); // Corresponding colors
+					.domain(['UAV', 'BackboneUAV', 'GroundStation', 'AttackNode', 'None']) // Add all expected labels
+					.range(['#333', 'green', 'teal', 'Red', 'grey']); // Corresponding colors
 
 				const links = svg
 					.selectAll('.link')
