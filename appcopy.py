@@ -463,5 +463,40 @@ def run_normal_simulation():
     return redirect(url_for("index"))
 
 
+@app.route("/simulations", methods=["POST"])
+def handle_simulations():
+    # Handle the button click here
+    print("Button was clicked!")
+    if "button_action" in request.form:
+        button_value = request.form["button_action"]
+        if button_value == "normalnetwork":
+            run_network_simulation(
+                uav_network,
+                total_time,
+                update_interval,
+                move_range,
+                connection_range,
+                backbone_range,
+                num_packets,
+            )
+            return redirect(url_for("indexcopy"))
+        elif button_value == "ddossim":
+            run_ddos_attack(
+                uav_network,
+                total_time,
+                update_interval,
+                move_range,
+                connection_range,
+                backbone_range,
+                num_packets,
+                target_ids,
+            )
+            return redirect(url_for("indexcopy"))
+    return redirect(url_for("indexcopy"))
+
+    # You can redirect or render a template after handling
+    return redirect(url_for("indexcopy"))
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5002)
