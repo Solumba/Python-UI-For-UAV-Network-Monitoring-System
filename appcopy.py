@@ -79,6 +79,34 @@ def fetch_data():
     return data
 
 
+def fetch_network_analysis_data():
+    document = network_collection.find_one(
+        {},
+        {
+            "_id": 0,
+            "Number of UAVs": 1,
+            "Number of Connections": 1,
+            "Sparsity": 1,
+            "Most Connected UAV": 1,
+            "Most Central UAV": 1,
+            "Most Critical UAV": 1,
+            "Connectivity": 1,
+        },
+    )
+
+    # Check if a document was found
+    if document:
+        # Convert the dictionary to a DataFrame
+        data = pd.DataFrame([document])  # Wrap the dictionary in a list
+    else:
+        # Handle the case where no data was found
+        print("No data found")
+        data = pd.DataFrame()  # Create an empty DataFrame if no document is found
+
+    print(data.head())  # Print the first few rows to inspect the DataFrame structure
+    return data
+
+
 def fetch_data_for_nodes(node_one, node_two):
     filter_query = {"node": {"$in": [node_one, node_two]}}
     data = pd.DataFrame(
@@ -333,6 +361,8 @@ def plot_battery_input(data, node_one, node_two):
 @app.route("/")
 def index():
     data = fetch_data()
+    network_metric = fetch_network_analysis_data()
+    print("Data retrieved:", network_metric)
     latency_script, latency_div = plot_latency(data)
     throughput_script, throughput_div = plot_throughput(data)
     battery_script, battery_div = plot_battery(data)
@@ -344,6 +374,7 @@ def index():
         throughput_div=throughput_div,
         battery_script=battery_script,
         battery_div=battery_div,
+        network_data=network_metric.to_dict(orient="records")[0],
     )
 
 
@@ -492,9 +523,6 @@ def handle_simulations():
                 target_ids,
             )
             return redirect(url_for("indexcopy"))
-    return redirect(url_for("indexcopy"))
-
-    # You can redirect or render a template after handling
     return redirect(url_for("indexcopy"))
 
 

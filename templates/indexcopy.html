@@ -121,6 +121,29 @@
 			<div class="metric-texts">Centrality: network metric</div>
 			<div class="metric-texts">Betweeness: network metric</div>
 			<div class="metric-texts">Sparsity: network metric</div>
+			<div>
+				<ul>
+					<li>
+						Number of UAVs: {{ network_data['Number of UAVs'] or 'N/A' }}
+					</li>
+					<li>
+						Number of Connections: {{ network_data['Number of Connections'] or 'N/A' }}
+					</li>
+					<li>Sparsity: {{ network_data['Sparsity'] or 'N/A' }}</li>
+					<li>
+						Most Connected UAV: {{ network_data['Most Connected UAV'] or 'N/A'
+						}}
+					</li>
+					<li>
+						Most Central UAV: {{ network_data['Most Central UAV'] or 'N/A' }}
+					</li>
+					<li>
+						Most Critical UAV: {{ network_data['Most Critical UAV'] or 'N/A'
+						}}
+					</li>
+					<li>Connectivity: {{ network_data['Connectivity'] or 'N/A' }}</li>
+				</ul>
+			</div>
 			<button
 				type="submit"
 				name="button_action"
