@@ -20,6 +20,7 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["ddos_simulation"]
 collection = db["simulation_metrics"]
 network_collection = db["network_metrics"]
+stats_collection = db["statistics"]
 
 # Appending the path of projectB to sys.path
 path_to_add = "../UAV Monitoring System/"
@@ -75,6 +76,13 @@ def fetch_data():
             )
         )
     )
+    print(data.head())  # Print the first few rows to inspect the DataFrame structure
+    return data
+
+
+def fetch_all_data():
+    # Fetch all data
+    data = pd.DataFrame(list(collection.find({})))
     print(data.head())  # Print the first few rows to inspect the DataFrame structure
     return data
 
@@ -173,7 +181,7 @@ def plot_latency_input(data, node_one, node_two):
 
     # Create Bokeh plot
     plot = figure(
-        title="Throughput over Time by UAV",
+        title="Latency over Time by UAV",
         x_axis_label="Time (s)",
         y_axis_label="Throughput (mbps)",
         sizing_mode="scale_width",
@@ -361,21 +369,26 @@ def plot_battery_input(data, node_one, node_two):
 @app.route("/")
 def index():
     data = fetch_data()
+
     network_metric = fetch_network_analysis_data()
     print("Data retrieved:", network_metric)
+
     latency_script, latency_div = plot_latency(data)
     throughput_script, throughput_div = plot_throughput(data)
     battery_script, battery_div = plot_battery(data)
-    return render_template(
-        "indexcopy.html",
-        latency_script=latency_script,
-        latency_div=latency_div,
-        throughput_script=throughput_script,
-        throughput_div=throughput_div,
-        battery_script=battery_script,
-        battery_div=battery_div,
-        network_data=network_metric.to_dict(orient="records")[0],
-    )
+    if not network_metric.empty:
+        return render_template(
+            "indexcopy.html",
+            latency_script=latency_script,
+            latency_div=latency_div,
+            throughput_script=throughput_script,
+            throughput_div=throughput_div,
+            battery_script=battery_script,
+            battery_div=battery_div,
+            network_data=network_metric.to_dict(orient="records")[0],
+        )
+    else:
+        return render_template("indexcopy.html", network_data=None)
 
 
 @app.route("/graph")
@@ -458,25 +471,6 @@ def plot_battery_data():
     )
 
 
-# @app.route("/simulations", methods=["POST"])
-# def run_ddos_simulation():
-#     # Handle the button click here
-#     print("Button was clicked!")
-#     run_ddos_attack(
-#         uav_network,
-#         total_time,
-#         update_interval,
-#         move_range,
-#         connection_range,
-#         backbone_range,
-#         num_packets,
-#         attack_node_id,
-#         target_ids,
-#     )
-#     # You can redirect or render a template after handling
-#     return redirect(url_for("index"))
-
-
 @app.route("/simulations", methods=["POST"])
 def run_normal_simulation():
     # Handle the button click here
@@ -524,6 +518,24 @@ def handle_simulations():
             )
             return redirect(url_for("indexcopy"))
     return redirect(url_for("indexcopy"))
+
+
+import pandas as pd
+
+
+# Descriptive stats
+def descriptive_statistics():
+    documents = list(collection.find({}))
+    print(documents)
+    # Load data into a DataFrame
+    data = pd.DataFrame(documents)
+    # Display the first few rows of the DataFrame to confirm it's loaded correctly
+    print(data.head())
+    stats = data.describe()
+    print(stats)
+
+
+descriptive_statistics()
 
 
 if __name__ == "__main__":

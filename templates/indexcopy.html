@@ -89,6 +89,17 @@
 				box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 			}
 
+			.stats {
+				position: absolute;
+				left: 50px;
+				top: 430px;
+				height: 200px;
+				width: 200px;
+				padding: 10px 30px;
+				background-color: white;
+				box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+			}
+
 			.attack {
 				background-color: red;
 				color: white;
@@ -117,17 +128,14 @@
 			<button type="submit" class="get-data">Get Node data</button>
 		</form>
 		<form action="/simulations" class="metrics" method="post">
-			Network Metrics Goes Here
-			<div class="metric-texts">Centrality: network metric</div>
-			<div class="metric-texts">Betweeness: network metric</div>
-			<div class="metric-texts">Sparsity: network metric</div>
+			<h3>Network Analysis</h3>
 			<div>
+				{% if network_data %}
 				<ul>
+					<li>Number of UAVs: {{ network_data['Number of UAVs'] or 'N/A' }}</li>
 					<li>
-						Number of UAVs: {{ network_data['Number of UAVs'] or 'N/A' }}
-					</li>
-					<li>
-						Number of Connections: {{ network_data['Number of Connections'] or 'N/A' }}
+						Number of Connections: {{ network_data['Number of Connections'] or
+						'N/A' }}
 					</li>
 					<li>Sparsity: {{ network_data['Sparsity'] or 'N/A' }}</li>
 					<li>
@@ -138,12 +146,15 @@
 						Most Central UAV: {{ network_data['Most Central UAV'] or 'N/A' }}
 					</li>
 					<li>
-						Most Critical UAV: {{ network_data['Most Critical UAV'] or 'N/A'
-						}}
+						Most Critical UAV: {{ network_data['Most Critical UAV'] or 'N/A' }}
 					</li>
-					<li>Connectivity: {{ network_data['Connectivity'] or 'N/A' }}</li>
+					<li>Connectivity: {{ network_data['Connectivity']}}</li>
 				</ul>
+				{% else %}
+				<p>No data available.</p>
+				{% endif %}
 			</div>
+			<h3>Simulation Options</h3>
 			<button
 				type="submit"
 				name="button_action"
@@ -156,6 +167,17 @@
 				DDoS Attack
 			</button>
 		</form>
+		<div class="stats" method="post">
+			<h3>Network Stats</h3>
+			<div>
+				<ul>
+					<li>Mean goes here</li>
+					<li>Median goes here</li>
+					<li>Descriptive stats goes here</li>
+				</ul>
+			</div>
+		</div>
+
 		<div class="dashboard-wrapper">
 			<div class="dashboard-container" style="height: 50%">
 				{{ latency_div|safe }}<!-- Bokeh plot -->
