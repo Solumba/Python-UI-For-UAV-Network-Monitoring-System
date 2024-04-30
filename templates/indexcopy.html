@@ -93,9 +93,9 @@
 				position: absolute;
 				left: 50px;
 				top: 430px;
-				height: 200px;
-				width: 200px;
-				padding: 10px 30px;
+				height: 150px;
+				width: 250px;
+				padding: 20px 20px;
 				background-color: white;
 				box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 			}
@@ -171,9 +171,10 @@
 			<h3>Network Stats</h3>
 			<div>
 				<ul>
-					<li>Mean goes here</li>
-					<li>Median goes here</li>
-					<li>Descriptive stats goes here</li>
+					<li>Mean Latency: {{ specific_stats.mean_latency }}</li>
+					<li>Mean Throughput: {{ specific_stats.mean_throughput }}</li>
+					<li>Maximum Throughput: {{ specific_stats.max_throughput }}</li>
+					<li>Minimum Battery: {{ specific_stats.min_battery }}</li>
 				</ul>
 			</div>
 		</div>

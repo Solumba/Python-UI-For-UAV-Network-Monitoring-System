@@ -20,7 +20,6 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["ddos_simulation"]
 collection = db["simulation_metrics"]
 network_collection = db["network_metrics"]
-stats_collection = db["statistics"]
 
 # Appending the path of projectB to sys.path
 path_to_add = "../UAV Monitoring System/"
@@ -372,6 +371,17 @@ def index():
 
     network_metric = fetch_network_analysis_data()
     print("Data retrieved:", network_metric)
+    #getting stats data
+    stats_data = fetch_all_data()
+    # Calculate Descriptive Statistics
+    stats = stats_data.describe().to_dict()
+    # Specific Statistics for Display
+    specific_stats = {
+        "mean_latency": round(stats_data["latency"].mean(), 2),
+        "mean_throughput": round(stats_data["throughput"].mean(), 2),
+        "max_throughput": round(stats_data["throughput"].max(), 2),
+        "min_battery": stats_data["battery"].min(),
+    }
 
     latency_script, latency_div = plot_latency(data)
     throughput_script, throughput_div = plot_throughput(data)
@@ -386,6 +396,7 @@ def index():
             battery_script=battery_script,
             battery_div=battery_div,
             network_data=network_metric.to_dict(orient="records")[0],
+            specific_stats=specific_stats,
         )
     else:
         return render_template("indexcopy.html", network_data=None)
@@ -518,24 +529,6 @@ def handle_simulations():
             )
             return redirect(url_for("indexcopy"))
     return redirect(url_for("indexcopy"))
-
-
-import pandas as pd
-
-
-# Descriptive stats
-def descriptive_statistics():
-    documents = list(collection.find({}))
-    print(documents)
-    # Load data into a DataFrame
-    data = pd.DataFrame(documents)
-    # Display the first few rows of the DataFrame to confirm it's loaded correctly
-    print(data.head())
-    stats = data.describe()
-    print(stats)
-
-
-descriptive_statistics()
 
 
 if __name__ == "__main__":
