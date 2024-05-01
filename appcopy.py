@@ -40,7 +40,7 @@ ground_station_pos = (50, 50)
 backbone_range = 50
 num_packets = 10
 
-total_time = 60  # Total time to run the simulation in seconds
+total_time = 120  # Total time to run the simulation in seconds
 update_interval = 5  # Time interval between updates in seconds
 move_range = 5
 target_ids = [5, 7]
@@ -49,6 +49,9 @@ network_sim = UAVNetworkSimulation(URI, AUTH)
 uav_network = network_sim.create_initial_graph(
     num_uavs, connection_range, ground_station_pos, backbone_range
 )
+
+network_sim.upload_to_neo4j(uav_network)
+
 attack_node_id = network_sim.add_attack_node(uav_network, target_ids, num_uavs)
 run_ddos_attack = network_sim.run_ddos_simulation
 run_network_simulation = network_sim.run_simulation
@@ -364,6 +367,7 @@ def plot_battery_input(data, node_one, node_two):
     script, div = components(plot)
     return script, div
 
+
 network_metric = fetch_network_analysis_data()
 print("Data retrieved:", network_metric)
 # getting stats data
@@ -484,23 +488,6 @@ def plot_battery_data():
     )
 
 
-# @app.route("/simulations", methods=["POST"])
-# def run_normal_simulation():
-#     # Handle the button click here
-#     print("Button was clicked!")
-#     run_network_simulation(
-#         uav_network,
-#         total_time,
-#         update_interval,
-#         move_range,
-#         connection_range,
-#         backbone_range,
-#         num_packets,
-#     )
-#     # You can redirect or render a template after handling
-#     return redirect(url_for("index"))
-
-
 @app.route("/simulations", methods=["POST"])
 def handle_simulations():
     # Handle the button click here
@@ -517,7 +504,7 @@ def handle_simulations():
                 backbone_range,
                 num_packets,
             )
-            return redirect(url_for("indexcopy"))
+            return redirect(url_for("index"))
         elif button_value == "ddossim":
             run_ddos_attack(
                 uav_network,
@@ -529,8 +516,8 @@ def handle_simulations():
                 num_packets,
                 target_ids,
             )
-            return redirect(url_for("indexcopy"))
-    return redirect(url_for("indexcopy"))
+            return redirect(url_for("index"))
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":
