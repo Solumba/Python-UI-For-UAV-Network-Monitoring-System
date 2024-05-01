@@ -364,25 +364,25 @@ def plot_battery_input(data, node_one, node_two):
     script, div = components(plot)
     return script, div
 
+network_metric = fetch_network_analysis_data()
+print("Data retrieved:", network_metric)
+# getting stats data
+stats_data = fetch_all_data()
+# Calculate Descriptive Statistics
+stats = stats_data.describe().to_dict()
+# Specific Statistics for Display
+specific_stats = {
+    "mean_latency": round(stats_data["latency"].mean(), 2),
+    "mean_throughput": round(stats_data["throughput"].mean(), 2),
+    "max_throughput": round(stats_data["throughput"].max(), 2),
+    "min_battery": stats_data["battery"].min(),
+}
+print(specific_stats)
+
 
 @app.route("/")
 def index():
     data = fetch_data()
-
-    network_metric = fetch_network_analysis_data()
-    print("Data retrieved:", network_metric)
-    #getting stats data
-    stats_data = fetch_all_data()
-    # Calculate Descriptive Statistics
-    stats = stats_data.describe().to_dict()
-    # Specific Statistics for Display
-    specific_stats = {
-        "mean_latency": round(stats_data["latency"].mean(), 2),
-        "mean_throughput": round(stats_data["throughput"].mean(), 2),
-        "max_throughput": round(stats_data["throughput"].max(), 2),
-        "min_battery": stats_data["battery"].min(),
-    }
-
     latency_script, latency_div = plot_latency(data)
     throughput_script, throughput_div = plot_throughput(data)
     battery_script, battery_div = plot_battery(data)
@@ -479,24 +479,26 @@ def plot_battery_data():
         throughput_div=throughput_div,
         battery_script=battery_script,
         battery_div=battery_div,
+        network_data=network_metric.to_dict(orient="records")[0],
+        specific_stats=specific_stats,
     )
 
 
-@app.route("/simulations", methods=["POST"])
-def run_normal_simulation():
-    # Handle the button click here
-    print("Button was clicked!")
-    run_network_simulation(
-        uav_network,
-        total_time,
-        update_interval,
-        move_range,
-        connection_range,
-        backbone_range,
-        num_packets,
-    )
-    # You can redirect or render a template after handling
-    return redirect(url_for("index"))
+# @app.route("/simulations", methods=["POST"])
+# def run_normal_simulation():
+#     # Handle the button click here
+#     print("Button was clicked!")
+#     run_network_simulation(
+#         uav_network,
+#         total_time,
+#         update_interval,
+#         move_range,
+#         connection_range,
+#         backbone_range,
+#         num_packets,
+#     )
+#     # You can redirect or render a template after handling
+#     return redirect(url_for("index"))
 
 
 @app.route("/simulations", methods=["POST"])
