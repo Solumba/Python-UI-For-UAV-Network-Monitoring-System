@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>UAV Network</title>
+		<script src="https://d3js.org/d3.v6.min.js"></script>
+		<script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.1.min.js"></script>
+		<script src="https://cdn.bokeh.org/bokeh/release/bokeh-widgets-3.4.1.min.js"></script>
+		<script src="https://cdn.bokeh.org/bokeh/release/bokeh-tables-3.4.1.min.js"></script>
+		<script src="https://cdn.bokeh.org/bokeh/release/bokeh-api-3.4.1.min.js"></script>
+
+		{{ latency_script|safe }}
+		<!-- Bokeh JS -->
+		{{ throughput_script|safe }}
+		<!-- Bokeh JS -->
+		{{ battery_script|safe }}
+		<!-- Bokeh JS -->
+		<style>
+			.bk-Figure {
+				height: 250px;
+				font-family: Arial, Helvetica, sans-serif;
+			}
+
+			body {
+				margin: 0;
+				font-family: Arial, Helvetica, sans-serif; /* Example of setting a default font for the body */
+			}
+
+			#navbar {
+				width: 100%;
+				background-color: #333;
+				color: white;
+				padding: 10px;
+				text-align: center;
+			}
+
+			#graph {
+				width: 100%;
+				height: 550px; /* Adjust based on your content */
+				background-color: #f0f0f0;
+				text-align: center;
+				margin-bottom: 10px;
+				padding-bottom: 100px;
+			}
+
+			.dashboard-wrapper {
+				display: flex; /* Enables flexbox */
+				justify-content: space-around; /* Distributes space around items */
+			}
+
+			.dashboard-container {
+				flex: 1; /* Each container will grow equally to fill the space */
+				margin: 5px; /* Gives space between the containers */
+				padding: 10px;
+				background-color: #e8e8e8;
+				height: 100px; /* Adjust based on your content */
+				box-sizing: border-box; /* Includes padding in the width and height */
+			}
+
+			.get-data {
+				background-color: green;
+				color: white;
+				padding: 6px;
+				border: none;
+				cursor: pointer;
+			}
+
+			.search {
+				text-align: center;
+			}
+
+			input {
+				border: none;
+				background-color: #ffffff;
+				padding: 3px;
+				border: 2px solid grey;
+				border-radius: 5%;
+			}
+
+			.metrics {
+				position: absolute;
+				right: 50px;
+				top: 100px;
+				height: 300px;
+				width: 250px;
+				padding: 10px 30px;
+				background-color: white;
+				box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+			}
+
+			.stats {
+				position: absolute;
+				left: 50px;
+				top: 430px;
+				height: 150px;
+				width: 250px;
+				padding: 20px 20px;
+				background-color: white;
+				box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+			}
+
+			.attack {
+				background-color: red;
+				color: white;
+				padding: 6px;
+				border: none;
+				cursor: pointer;
+			}
+
+			/* Responsive adjustments if needed */
+			@media (max-width: 600px) {
+				.dashboard-wrapper {
+					flex-direction: column; /* Stacks the containers vertically */
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div id="navbar">UAV Network Monitoring System</div>
+
+		<div id="graph"></div>
+		<form action="/submit" method="post" class="search">
+			<label for="first_node">UAV:</label>
+			<input type="text" name="first_node" id="first_node" />
+			<label for="second_node">UAV:</label>
+			<input type="text" name="second_node" id="second_node" />
+			<button type="submit" class="get-data">Get Node data</button>
+		</form>
+		<form action="/simulations" class="metrics" method="post">
+			<h3>Network Analysis</h3>
+			<div>
+				{% if network_data %}
+				<ul>
+					<li>Number of UAVs: {{ network_data['Number of UAVs'] or 'N/A' }}</li>
+					<li>
+						Number of Connections: {{ network_data['Number of Connections'] or
+						'N/A' }}
+					</li>
+					<li>Sparsity: {{ network_data['Sparsity'] or 'N/A' }}</li>
+					<li>
+						Most Connected UAV: {{ network_data['Most Connected UAV'] or 'N/A'
+						}}
+					</li>
+					<li>
+						Most Central UAV: {{ network_data['Most Central UAV'] or 'N/A' }}
+					</li>
+					<li>
+						Most Critical UAV: {{ network_data['Most Critical UAV'] or 'N/A' }}
+					</li>
+					<li>Connectivity: {{ network_data['Connectivity']}}</li>
+				</ul>
+				{% else %}
+				<p>No data available.</p>
+				{% endif %}
+			</div>
+			<h3>Simulation Options</h3>
+			<button
+				type="submit"
+				name="button_action"
+				value="normalnetwork"
+				class="normal get-data"
+			>
+				Normal Network
+			</button>
+			<button type="submit" name="button_action" value="ddossim" class="attack">
+				DDoS Attack
+			</button>
+		</form>
+		<div class="stats" method="post">
+			<h3>Network Stats</h3>
+			<div>
+				<ul>
+					<li>Mean Latency: {{ specific_stats.mean_latency }}</li>
+					<li>Mean Throughput: {{ specific_stats.mean_throughput }}</li>
+					<li>Maximum Throughput: {{ specific_stats.max_throughput }}</li>
+					<li>Minimum Battery: {{ specific_stats.min_battery }}</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="dashboard-wrapper">
+			<div class="dashboard-container" style="height: 50%">
+				{{ latency_div|safe }}<!-- Bokeh plot -->
+			</div>
+			<div class="dashboard-container" style="height: 50%">
+				{{ throughput_div|safe }}<!-- Bokeh plot -->
+			</div>
+			<div class="dashboard-container" style="height: 50%">
+				{{ battery_div|safe }}<!-- Bokeh plot -->
+			</div>
+		</div>
+
+		<script>
+			function drawGraph(graph) {
+				document.getElementById('graph').innerHTML = ''; // Clear the previous graph
+				const width = 600,
+					height = 600;
+				const svg = d3
+					.select('#graph')
+					.append('svg')
+					.attr('width', width)
+					.attr('height', height)
+					.attr('text-align', 'left');
+
+				// Define color mapping based on labels
+				const color = d3
+					.scaleOrdinal()
+					.domain(['UAV', 'BackboneUAV', 'GroundStation', 'AttackNode', 'None']) // Add all expected labels
+					.range(['#333', 'green', 'teal', 'Red', 'grey']); // Corresponding colors
+
+				const links = svg
+					.selectAll('.link')
+					.data(graph.links)
+					.enter()
+					.append('line')
+					.attr('class', 'link')
+					.style('stroke', '#aaa');
+
+				const nodes = svg
+					.selectAll('.node')
+					.data(graph.nodes)
+					.enter()
+					.append('circle')
+					.attr('class', 'node')
+					.attr('r', 12)
+					.style('fill', (d) => color(d.label));
+
+				// Create node titles
+				const titles = svg
+					.selectAll('.title')
+					.data(graph.nodes)
+					.enter()
+					.append('text')
+					.attr('class', 'title')
+					.attr('x', (d) => d.x)
+					.attr('y', (d) => d.y + 20) // Offset below the node
+					.attr('text-anchor', 'middle') // Center the text under the node
+					.text((d) => d.uavType) // Use the 'name' property from node data
+					.style('font-size', '12px')
+					.style('fill', 'black'); // Adjust color as needed
+
+				const simulation = d3
+					.forceSimulation(graph.nodes)
+					.force(
+						'link',
+						d3
+							.forceLink(graph.links)
+							.id((d) => d.id)
+							.distance(250),
+					)
+					.force('charge', d3.forceManyBody().strength(-75))
+					.force('center', d3.forceCenter(width / 2, height / 2))
+					.force('collision', d3.forceCollide().radius(15));
+
+				simulation.on('tick', () => {
+					links
+						.attr('x1', (d) => d.source.x)
+						.attr('y1', (d) => d.source.y)
+						.attr('x2', (d) => d.target.x)
+						.attr('y2', (d) => d.target.y);
+
+					nodes
+						.attr('cx', (d) => Math.max(5, Math.min(width - 5, d.x)))
+						.attr('cy', (d) => Math.max(5, Math.min(height - 5, d.y)));
+
+					titles.attr('x', (d) => d.x).attr('y', (d) => d.y + 20); // Offset y position below the node
+				});
+			}
+
+			function fetchGraph() {
+				fetch('/graph')
+					.then((response) => response.json())
+					.then((graph) => {
+						console.log(graph); // Log the graph data to check
+						drawGraph(graph);
+					});
+			}
+
+			fetchGraph();
+			setInterval(fetchGraph, 10000); // Refresh graph every 10 seconds
+		</script>
+	</body>
+</html>
