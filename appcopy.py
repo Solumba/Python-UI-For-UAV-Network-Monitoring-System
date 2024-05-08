@@ -377,6 +377,19 @@ def plot_battery_input(data, node_one, node_two):
     script, div = components(plot)
     return script, div
 
+# Creating The Network First
+# Initialize Simulation
+simulation = UAVNetworkSimulation(URI, AUTH)
+
+# Create and Setup UAV Network
+uav_network = simulation.create_initial_graph(
+    num_uavs, connection_range, ground_station_pos, backbone_range
+)
+
+# Upload to Neo4j
+simulation.upload_to_neo4j(uav_network)
+
+simulation.analyze_network(uav_network)
 
 network_metric = fetch_network_analysis_data()
 print("Data retrieved:", network_metric)
@@ -496,19 +509,6 @@ def plot_battery_data():
         network_data=network_metric.to_dict(orient="records")[0],
         specific_stats=specific_stats,
     )
-
-
-# Creating The Network First
-# Initialize Simulation
-simulation = UAVNetworkSimulation(URI, AUTH)
-
-# Create and Setup UAV Network
-uav_network = simulation.create_initial_graph(
-    num_uavs, connection_range, ground_station_pos, backbone_range
-)
-
-# Upload to Neo4j
-simulation.upload_to_neo4j(uav_network)
 
 
 @app.route("/simulations", methods=["POST"])
