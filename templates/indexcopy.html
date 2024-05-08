@@ -108,6 +108,67 @@
 				cursor: pointer;
 			}
 
+			.loader {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 100vh;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: #333333;
+				transition: opacity 0.75s, visibility 0.75s;
+			}
+
+			.loader2 {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100vw;
+				height: 100vh;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: #333333;
+				opacity: 0.8;
+				transition: opacity 0.75s, visibility 0.75s;
+			}
+
+			.loader--hidden {
+				opacity: 0;
+				visibility: hidden;
+			}
+
+			.loader::after {
+				content: '';
+				width: 75px;
+				height: 75px;
+				border: 15px solid #dddddd;
+				border-top-color: #009578;
+				border-radius: 50%;
+				animation: loading 0.75s ease infinite;
+			}
+
+			.loader2::after {
+				content: '';
+				width: 75px;
+				height: 75px;
+				border: 15px solid #dddddd;
+				border-top-color: #009578;
+				border-radius: 50%;
+				animation: loading 0.75s ease infinite;
+			}
+
+			@keyframes loading {
+				from {
+					transform: rotate(0turn);
+				}
+				to {
+					transform: rotate(1turn);
+				}
+			}
+
 			/* Responsive adjustments if needed */
 			@media (max-width: 600px) {
 				.dashboard-wrapper {
@@ -156,6 +217,7 @@
 			</div>
 			<h3>Simulation Options</h3>
 			<button
+				id="normbtn"
 				type="submit"
 				name="button_action"
 				value="normalnetwork"
@@ -190,6 +252,7 @@
 				{{ battery_div|safe }}<!-- Bokeh plot -->
 			</div>
 		</div>
+		<div class="loader"></div>
 
 		<script>
 			function drawGraph(graph) {
@@ -276,6 +339,21 @@
 						drawGraph(graph);
 					});
 			}
+
+			window.addEventListener('load', () => {
+				const loader = document.querySelector('.loader');
+
+				loader.classList.add('loader--hidden');
+			});
+
+			const normbtn = document.getElementById('normbtn');
+
+			normbtn.addEventListener('click', () => {
+				const loader = document.querySelector('.loader');
+
+				loader.classList.remove('loader--hidden');
+				loader.classList.add('loader2');
+			});
 
 			fetchGraph();
 			setInterval(fetchGraph, 10000); // Refresh graph every 10 seconds
