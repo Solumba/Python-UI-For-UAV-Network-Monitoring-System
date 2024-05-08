@@ -389,26 +389,24 @@ uav_network = simulation.create_initial_graph(
 # Upload to Neo4j
 simulation.upload_to_neo4j(uav_network)
 
-simulation.analyze_network(uav_network)
-
-network_metric = fetch_network_analysis_data()
-print("Data retrieved:", network_metric)
-# getting stats data
-stats_data = fetch_all_data()
-# Calculate Descriptive Statistics
-stats = stats_data.describe().to_dict()
-# Specific Statistics for Display
-specific_stats = {
-    "mean_latency": round(stats_data["latency"].mean(), 2),
-    "mean_throughput": round(stats_data["throughput"].mean(), 2),
-    "max_throughput": round(stats_data["throughput"].max(), 2),
-    "min_battery": stats_data["battery"].min(),
-}
-print(specific_stats)
-
 
 @app.route("/")
 def index():
+    simulation.analyze_network(uav_network)
+    network_metric = fetch_network_analysis_data()
+    print("Data retrieved:", network_metric)
+    # getting stats data
+    stats_data = fetch_all_data()
+    # Calculate Descriptive Statistics
+    #stats = stats_data.describe().to_dict()
+    # Specific Statistics for Display
+    specific_stats = {
+        "mean_latency": round(stats_data["latency"].mean(), 2),
+        "mean_throughput": round(stats_data["throughput"].mean(), 2),
+        "max_throughput": round(stats_data["throughput"].max(), 2),
+        "min_battery": stats_data["battery"].min(),
+    }
+    print(specific_stats)
     data = fetch_data()
     latency_script, latency_div = plot_latency(data)
     throughput_script, throughput_div = plot_throughput(data)
@@ -493,6 +491,22 @@ def plot_battery_data():
 
     n1 = int(node_one)
     n2 = int(node_two)
+    
+    simulation.analyze_network(uav_network)
+    network_metric = fetch_network_analysis_data()
+    print("Data retrieved:", network_metric)
+    # getting stats data
+    stats_data = fetch_all_data()
+    # Calculate Descriptive Statistics
+    #stats = stats_data.describe().to_dict()
+    # Specific Statistics for Display
+    specific_stats = {
+        "mean_latency": round(stats_data["latency"].mean(), 2),
+        "mean_throughput": round(stats_data["throughput"].mean(), 2),
+        "max_throughput": round(stats_data["throughput"].max(), 2),
+        "min_battery": stats_data["battery"].min(),
+    }
+    print(specific_stats)
 
     data = fetch_data_for_nodes(n1, n2)  # Fetch data for these nodes
     latency_script, latency_div = plot_latency_input(data, n1, n2)
@@ -1085,7 +1099,7 @@ class UAVNetworkSimulation:
             self.update_network_connections(G, connection_range, backbone_range)
             self.update_network_metrics(G)
             self.update_neo4j_database(G)
-            self.draw_graph(G)
+            
 
             # Trigger DDoS attack
             if iteration == 1:
@@ -1121,6 +1135,7 @@ class UAVNetworkSimulation:
             iteration += 1
 
         print("Metrics have been saved to MongoDB.")
+        self.draw_graph(G)
         return current_metrics
 
     def plot_time_series(self, results):
