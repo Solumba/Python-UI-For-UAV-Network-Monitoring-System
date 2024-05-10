@@ -195,7 +195,7 @@ def plot_latency_input(data, node_one, node_two):
     plot = figure(
         title="Latency over Time by UAV",
         x_axis_label="Time (s)",
-        y_axis_label="Throughput (mbps)",
+        y_axis_label="Latency (ms)",
         sizing_mode="scale_width",
     )
     source_one = ColumnDataSource(data_node_one)
@@ -377,6 +377,7 @@ def plot_battery_input(data, node_one, node_two):
     script, div = components(plot)
     return script, div
 
+
 # Creating The Network First
 # Initialize Simulation
 simulation = UAVNetworkSimulation(URI, AUTH)
@@ -398,7 +399,7 @@ def index():
     # getting stats data
     stats_data = fetch_all_data()
     # Calculate Descriptive Statistics
-    #stats = stats_data.describe().to_dict()
+    # stats = stats_data.describe().to_dict()
     # Specific Statistics for Display
     specific_stats = {
         "mean_latency": round(stats_data["latency"].mean(), 2),
@@ -491,14 +492,14 @@ def plot_battery_data():
 
     n1 = int(node_one)
     n2 = int(node_two)
-    
+
     simulation.analyze_network(uav_network)
     network_metric = fetch_network_analysis_data()
     print("Data retrieved:", network_metric)
     # getting stats data
     stats_data = fetch_all_data()
     # Calculate Descriptive Statistics
-    #stats = stats_data.describe().to_dict()
+    # stats = stats_data.describe().to_dict()
     # Specific Statistics for Display
     specific_stats = {
         "mean_latency": round(stats_data["latency"].mean(), 2),
@@ -1099,7 +1100,6 @@ class UAVNetworkSimulation:
             self.update_network_connections(G, connection_range, backbone_range)
             self.update_network_metrics(G)
             self.update_neo4j_database(G)
-            
 
             # Trigger DDoS attack
             if iteration == 1:
@@ -1175,10 +1175,10 @@ class UAVNetworkSimulation:
         num_edges = G.number_of_edges()
         sparsity = round(
             nx.density(G), 4
-        )  # Density close to 0 indicates a sparse graph
+        ) 
 
         # Centrality measures
-        degree_centrality = nx.degree_centrality(G)  # Normalized to (n-1)
+        degree_centrality = nx.degree_centrality(G)
         closeness_centrality = nx.closeness_centrality(G)
         betweenness_centrality = nx.betweenness_centrality(G)
 
@@ -1219,7 +1219,7 @@ class UAVNetworkSimulation:
         collection.insert_one(network_metrics_ready)
 
         # Plotting
-        pos = nx.spring_layout(G)  # positions for all nodes
+        pos = nx.spring_layout(G) 
         plt.figure(figsize=(8, 8))
         nx.draw_networkx_nodes(G, pos, node_size=700)
         nx.draw_networkx_edges(G, pos, width=6)
